@@ -21,9 +21,9 @@ const Home = ({
           Select your data source and upload files to get started.
         </p>
       </div>
-
+      <div className='flex'>
       {/* Source Selection */}
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 md:p-8">
+      <div className="w-[40%] bg-white rounded-2xl shadow-lg border border-gray-100 p-6 md:p-8 mr-6">
         <h2 className="text-2xl font-semibold text-gray-800 mb-6">Select Data Source</h2>
         <SourceSelection
           selectedSource={selectedSource}
@@ -34,12 +34,13 @@ const Home = ({
       </div>
 
       {/* File Upload */}
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 md:p-8">
+      <div className="w-[60%] bg-white rounded-2xl shadow-lg border border-gray-100 p-6 md:p-8">
         <h2 className="text-2xl font-semibold text-gray-800 mb-6">Upload Files</h2>
         <FileUpload
           onFileSelect={onFileSelect}
           selectedSource={selectedSource}
         />
+      </div>
       </div>
     </div>
   );

@@ -4,8 +4,7 @@ import {
   File,
   X,
   Check,
-  UploadCloud as CloudUpload,
-  Ambulance as Cancel,
+  UploadCloud,
   FileText,
   Music,
   Video,
@@ -193,9 +192,9 @@ const FileUpload = ({ onFileSelect, selectedSource }) => {
 
   if (!selectedFile) {
     return (
-      <div className="space-y-4">
+      <div className="w-full space-y-4">
         <div
-          className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-all ${
+          className={`relative border-2 border-dashed rounded-lg p-6 text-center transition-all w-full ${
             dragActive
               ? "border-blue-400 bg-blue-50"
               : "border-gray-300 hover:border-gray-400"
@@ -218,7 +217,7 @@ const FileUpload = ({ onFileSelect, selectedSource }) => {
                 dragActive ? "bg-blue-100" : "bg-gray-100"
               }`}
             >
-              <CloudUpload
+              <UploadCloud
                 className={`w-8 h-8 ${
                   dragActive ? "text-blue-500" : "text-gray-400"
                 }`}
@@ -256,11 +255,11 @@ const FileUpload = ({ onFileSelect, selectedSource }) => {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="w-full space-y-4">
+      <div className="bg-white rounded-lg border border-gray-200 p-4 w-full">
+        <div className="flex flex-col space-y-4">
           <div className="flex items-center space-x-4">
-            <div className="w-20 h-20 rounded-lg overflow-hidden flex items-center justify-center bg-gray-100 border-2 border-gray-200">
+            <div className="w-16 h-16 rounded-lg overflow-hidden flex items-center justify-center bg-gray-100 border-2 border-gray-200 flex-shrink-0">
               {fileType === "image" && previewUrl ? (
                 <img
                   src={previewUrl}
@@ -281,21 +280,21 @@ const FileUpload = ({ onFileSelect, selectedSource }) => {
               <p className="text-xs text-gray-500 uppercase">{fileType} File</p>
             </div>
           </div>
-          <div className="flex items-center justify-end space-x-3">
+          <div className="flex items-center justify-end space-x-3 w-full">
             {!uploading ? (
               <>
                 <button
                   onClick={handleUpload}
                   className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                 >
-                  <CloudUpload className="w-4 h-4 mr-2" />
+                  <UploadCloud className="w-4 h-4 mr-2" />
                   Upload
                 </button>
                 <button
                   onClick={handleCancel}
                   className="inline-flex items-center px-4 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors"
                 >
-                  <Cancel className="w-4 h-4 mr-2" />
+                  <X className="w-4 h-4 mr-2" />
                   Cancel
                 </button>
               </>
@@ -314,7 +313,7 @@ const FileUpload = ({ onFileSelect, selectedSource }) => {
                     disabled={uploadProgress > 90}
                     className="inline-flex items-center px-3 py-1 text-xs border border-red-300 text-red-600 rounded hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <Cancel className="w-3 h-3 mr-1" />
+                    <X className="w-3 h-3 mr-1" />
                     Cancel
                   </button>
                 </div>
@@ -325,7 +324,7 @@ const FileUpload = ({ onFileSelect, selectedSource }) => {
       </div>
 
       {uploadedFilename && fileType === "image" && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+        <div className="bg-green-50 border border-green-200 rounded-lg p-6 w-full">
           <div className="text-center space-y-4">
             <div className="flex items-center justify-center">
               <Check className="w-8 h-8 text-green-600" />

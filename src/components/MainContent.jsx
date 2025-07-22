@@ -1,7 +1,7 @@
 import React from 'react';
 import SourceSelection from './SourceSelection';
 import FileUpload from './FileUpload';
-import { Activity, Clock, FileText, Upload as UploadIcon } from 'lucide-react';
+import { Activity, Clock, FileText, Upload } from 'lucide-react';
 
 const MainContent = ({
   activeTab,
@@ -106,30 +106,35 @@ const MainContent = ({
         </div>
 
         <div className="space-y-8">
-          {/* Source Configuration */}
+          {/* Combined Source Configuration and File Upload */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="mb-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-2">Configure Data Sources</h2>
-              <p className="text-gray-600">Select your primary data source and specify the sub-source type</p>
-            </div>
-            <SourceSelection
-              selectedSource={selectedSource}
-              selectedSubSource={selectedSubSource}
-              onSourceChange={onSourceChange}
-              onSubSourceChange={onSubSourceChange}
-            />
-          </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Source Configuration - 50% */}
+              <div>
+                <div className="mb-6">
+                  <h2 className="text-lg font-semibold text-gray-900 mb-2">Configure Data Sources</h2>
+                  <p className="text-gray-600">Select your primary data source and specify the sub-source type</p>
+                </div>
+                <SourceSelection
+                  selectedSource={selectedSource}
+                  selectedSubSource={selectedSubSource}
+                  onSourceChange={onSourceChange}
+                  onSubSourceChange={onSubSourceChange}
+                />
+              </div>
 
-          {/* File Upload */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="mb-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-2 flex items-center">
-                <UploadIcon className="w-5 h-5 mr-2" />
-                File Upload
-              </h2>
-              <p className="text-gray-600">Upload your data files for processing and analysis</p>
+              {/* File Upload - 50% */}
+              <div>
+                <div className="mb-6">
+                  <h2 className="text-lg font-semibold text-gray-900 mb-2 flex items-center">
+                    <Upload className="w-5 h-5 mr-2" />
+                    File Upload
+                  </h2>
+                  <p className="text-gray-600">Upload your data files for processing and analysis</p>
+                </div>
+                <FileUpload onFileSelect={onFileSelect} />
+              </div>
             </div>
-            <FileUpload onFileSelect={onFileSelect} />
           </div>
 
           {/* Action Buttons */}

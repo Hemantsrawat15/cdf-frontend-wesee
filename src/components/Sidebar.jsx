@@ -21,7 +21,7 @@ const Sidebar = ({ activeTab, onTabChange, isCollapsed, onToggleCollapse }) => {
       <div className="h-20 px-4 border-b border-slate-800 flex items-center justify-between">
         {!isCollapsed && (
           <div className="flex-1 flex justify-center">
-            <img src={NavyLogo} alt="Navy Logo" className="h-12 w-auto" />
+            <img src={NavyLogo} alt="Navy Logo" className="h-16 w-auto" />
           </div>
         )}
         <button
