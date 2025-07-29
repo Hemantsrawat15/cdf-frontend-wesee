@@ -31,9 +31,11 @@ const FileUpload = ({ onFileSelect, selectedSource }) => {
     excel: [
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     ],
+    ndjson: ["application/x-ndjson"], // ✅ added
   };
 
-  
+
+
 
   useEffect(() => {
     return () => {
@@ -43,11 +45,20 @@ const FileUpload = ({ onFileSelect, selectedSource }) => {
     };
   }, [previewUrl]);
 
-  const getFileTypeCategory = (type) => {
-    return Object.keys(acceptedFileTypes).find((cat) =>
+  const getFileTypeCategory = (type, name) => {
+    const matchByMime = Object.keys(acceptedFileTypes).find((cat) =>
       acceptedFileTypes[cat].includes(type)
     );
+
+    if (matchByMime) return matchByMime;
+
+    // fallback check by file extension
+    const ext = name?.split(".").pop()?.toLowerCase();
+    if (ext === "ndjson") return "ndjson";
+
+    return null;
   };
+
 
   const handleDrag = useCallback((e) => {
     e.preventDefault();
@@ -68,7 +79,7 @@ const FileUpload = ({ onFileSelect, selectedSource }) => {
       const file = e.dataTransfer.files?.[0];
       if (!file) return;
 
-      const type = getFileTypeCategory(file.type);
+      const type = getFileTypeCategory(file.type, file.name);
       if (!type) {
         alert("Unsupported file type");
         return;
@@ -92,7 +103,7 @@ const FileUpload = ({ onFileSelect, selectedSource }) => {
       const file = e.target.files?.[0];
       if (!file) return;
 
-      const type = getFileTypeCategory(file.type);
+      const type = getFileTypeCategory(file.type, file.name);
       if (!type) {
         alert("Unsupported file type");
         return;
@@ -196,11 +207,10 @@ const FileUpload = ({ onFileSelect, selectedSource }) => {
     return (
       <div className="w-full space-y-4">
         <div
-          className={`relative border-2 border-dashed rounded-lg p-6 text-center transition-all w-full ${
-            dragActive
+          className={`relative border-2 border-dashed rounded-lg p-6 text-center transition-all w-full ${dragActive
               ? "border-blue-400 bg-blue-50"
               : "border-gray-300 hover:border-gray-400"
-          }`}
+            }`}
           onDragEnter={handleDrag}
           onDragLeave={handleDrag}
           onDragOver={handleDrag}
@@ -211,25 +221,22 @@ const FileUpload = ({ onFileSelect, selectedSource }) => {
             type="file"
             onChange={handleFileSelect}
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-            accept="image/*,audio/*,video/*,application/pdf,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            accept="image/*,audio/*,video/*,application/pdf,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/x-ndjson"
           />
           <div className="space-y-4 pointer-events-none">
             <div
-              className={`mx-auto w-16 h-16 rounded-full flex items-center justify-center transition-colors ${
-                dragActive ? "bg-blue-100" : "bg-gray-100"
-              }`}
+              className={`mx-auto w-16 h-16 rounded-full flex items-center justify-center transition-colors ${dragActive ? "bg-blue-100" : "bg-gray-100"
+                }`}
             >
               <UploadCloud
-                className={`w-8 h-8 ${
-                  dragActive ? "text-blue-500" : "text-gray-400"
-                }`}
+                className={`w-8 h-8 ${dragActive ? "text-blue-500" : "text-gray-400"
+                  }`}
               />
             </div>
             <div>
               <p
-                className={`text-lg font-medium ${
-                  dragActive ? "text-blue-600" : "text-gray-700"
-                }`}
+                className={`text-lg font-medium ${dragActive ? "text-blue-600" : "text-gray-700"
+                  }`}
               >
                 {dragActive ? "Drop files here" : "Drag & Drop Files Here"}
               </p>
