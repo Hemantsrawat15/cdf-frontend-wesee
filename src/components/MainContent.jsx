@@ -59,12 +59,10 @@ const MainContent = ({
                 <div key={item.id} className="p-6 hover:bg-gray-50 transition-colors">
                   <div className="flex items-start justify-between">
                     <div className="flex items-start space-x-4">
-                      <div className={`p-2 rounded-lg ${
-                        item.status === 'completed' ? 'bg-green-100' : 'bg-red-100'
-                      }`}>
-                        <FileText className={`w-5 h-5 ${
-                          item.status === 'completed' ? 'text-green-600' : 'text-red-600'
-                        }`} />
+                      <div className={`p-2 rounded-lg ${item.status === 'completed' ? 'bg-green-100' : 'bg-red-100'
+                        }`}>
+                        <FileText className={`w-5 h-5 ${item.status === 'completed' ? 'text-green-600' : 'text-red-600'
+                          }`} />
                       </div>
                       <div className="space-y-1">
                         <h3 className="font-medium text-gray-900">{item.fileName}</h3>
@@ -76,11 +74,10 @@ const MainContent = ({
                       </div>
                     </div>
                     <div className="flex items-center space-x-3">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        item.status === 'completed'
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${item.status === 'completed'
                           ? 'bg-green-100 text-green-700'
                           : 'bg-red-100 text-red-700'
-                      }`}>
+                        }`}>
                         {item.status === 'completed' ? 'Completed' : 'Failed'}
                       </span>
                     </div>
@@ -108,8 +105,8 @@ const MainContent = ({
         <div className="space-y-8">
           {/* Combined Source Configuration and File Upload */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Source Configuration - 50% */}
+            <div className="space-y-12">
+              {/* Source Configuration on top */}
               <div>
                 <div className="mb-6">
                   <h2 className="text-lg font-semibold text-gray-900 mb-2">Configure Data Sources</h2>
@@ -123,7 +120,7 @@ const MainContent = ({
                 />
               </div>
 
-              {/* File Upload - 50% */}
+              {/* File Upload below */}
               <div>
                 <div className="mb-6">
                   <h2 className="text-lg font-semibold text-gray-900 mb-2 flex items-center">
@@ -135,6 +132,7 @@ const MainContent = ({
                 <FileUpload onFileSelect={onFileSelect} />
               </div>
             </div>
+
           </div>
 
           {/* Action Buttons */}

@@ -33,6 +33,8 @@ const FileUpload = ({ onFileSelect, selectedSource }) => {
     ],
   };
 
+  
+
   useEffect(() => {
     return () => {
       if (previewUrl?.startsWith("blob:")) {
@@ -116,7 +118,7 @@ const FileUpload = ({ onFileSelect, selectedSource }) => {
 
     const formData = new FormData();
     formData.append("file", selectedFile);
-    formData.append("file_type", selectedSource || "");
+    formData.append("source", selectedSource || "");
 
     try {
       const progressInterval = setInterval(() => {
@@ -129,7 +131,7 @@ const FileUpload = ({ onFileSelect, selectedSource }) => {
         });
       }, 200);
 
-      const res = await fetch("http://127.0.0.1:8000/upload/structured", {
+      const res = await fetch("http://127.0.0.1:8000/upload/detect", {
         method: "POST",
         body: formData,
       });
