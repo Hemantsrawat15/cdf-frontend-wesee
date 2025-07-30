@@ -95,6 +95,20 @@ const History = () => {
     }
   };
 
+  const handleViewMetadata = async (uuid) => {
+    try {
+      const response = await fetch(`http://localhost:8000/file/metadata/${uuid}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch metadata");
+      }
+      const data = await response.json();
+      alert(`Metadata for UUID ${uuid}:\n\n` + JSON.stringify(data, null, 2));
+    } catch (error) {
+      console.error("Metadata view failed:", error);
+      alert("Failed to fetch metadata.");
+    }
+  };
+
   return (
     <div className="space-y-8">
       <div className="text-center space-y-4">
@@ -143,7 +157,11 @@ const History = () => {
                     {item.status}
                   </span>
                   <div className="flex space-x-2">
-                    <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                    <button
+                      onClick={() => handleViewMetadata(item.uuid)}
+                      className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                      title="View File Metadata"
+                    >
                       <Eye className="w-4 h-4" />
                     </button>
                     <button
