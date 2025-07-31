@@ -1,6 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect } from "react";
 import {
-  Upload,
   File,
   X,
   Check,
@@ -129,9 +128,20 @@ const FileUpload = ({ onFileSelect, selectedSource }) => {
 
     const formData = new FormData();
     formData.append("file", selectedFile);
-    formData.append("source", selectedSource || "");
 
     try {
+      // Step 1: Get source name from source ID
+      let sourceName = "";
+      if (selectedSource) {
+        const sourceRes = await fetch(`http://127.0.0.1:8000/source/name/${selectedSource}`);
+        if (!sourceRes.ok) throw new Error("Failed to fetch source name");
+        const sourceData = await sourceRes.json();
+        sourceName = sourceData.name;
+      }
+
+      formData.append("source", sourceName);
+
+      // Optional: Update UI with progress
       const progressInterval = setInterval(() => {
         setUploadProgress((prev) => {
           if (prev >= 90) {
@@ -142,6 +152,7 @@ const FileUpload = ({ onFileSelect, selectedSource }) => {
         });
       }, 200);
 
+      // Step 2: Upload file
       const res = await fetch("http://127.0.0.1:8000/upload/detect", {
         method: "POST",
         body: formData,
@@ -165,6 +176,7 @@ const FileUpload = ({ onFileSelect, selectedSource }) => {
       setUploadProgress(0);
     }
   };
+
 
   const handleCancel = () => {
     setSelectedFile(null);
@@ -208,8 +220,8 @@ const FileUpload = ({ onFileSelect, selectedSource }) => {
       <div className="w-full space-y-4">
         <div
           className={`relative border-2 border-dashed rounded-lg p-6 text-center transition-all w-full ${dragActive
-              ? "border-blue-400 bg-blue-50"
-              : "border-gray-300 hover:border-gray-400"
+            ? "border-blue-400 bg-blue-50"
+            : "border-gray-300 hover:border-gray-400"
             }`}
           onDragEnter={handleDrag}
           onDragLeave={handleDrag}
