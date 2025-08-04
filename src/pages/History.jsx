@@ -1,8 +1,30 @@
 import React, { useEffect, useState } from 'react';
-import { Clock, FileText, Download, Eye } from 'lucide-react';
+import { Clock, FileText, Download, Eye, X } from 'lucide-react';
 
 const History = () => {
   const [historyItems, setHistoryItems] = useState([]);
+  const [metadataModal, setMetadataModal] = useState({
+    isOpen: false,
+    data: null,
+    uuid: null
+  });
+
+  function formatToDDMMYYYY_HHMMSS(dateString) {
+  if (!dateString) return '';
+  // Handles "YYYY-MM-DD HH:MM:SS"
+  if (dateString.includes(' ')) {
+    const [datePart, timePart] = dateString.split(' ');
+    const [year, month, day] = datePart.split('-');
+    return `${day}/${month}/${year} ${timePart}`;
+  }
+  // Handles ISO strings
+  const d = new Date(dateString);
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const year = String(d.getFullYear());
+  const time = d.toTimeString().slice(0, 8);
+  return `${day}/${month}/${year} ${time}`;
+}
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -14,7 +36,7 @@ const History = () => {
           id: index + 1,
           filename: item.filename,
           uuid: item.uuid,
-          timestamp: item.timestamp,
+          timestamp: formatToDDMMYYYY_HHMMSS(item.timestamp),
           source: item.source,
           content_type: item.content_type,
           size: (item.size / 1024).toFixed(1) + ' KB',
@@ -45,13 +67,24 @@ const History = () => {
 
   const handleDownload = async (uuid, filename) => {
     try {
+      console.log(`Attempting to download file with UUID: ${uuid}`);
       const response = await fetch(`http://localhost:8000/file/raw-data/${uuid}`);
 
       if (!response.ok) {
-        throw new Error(`Failed to download file with UUID ${uuid}`);
+        throw new Error(`Failed to download file with UUID ${uuid}. Status: ${response.status}`);
       }
 
+      // Check if the response has content
+      const contentLength = response.headers.get('content-length');
+      console.log(`Content-Length: ${contentLength}`);
+
       const blob = await response.blob();
+      console.log(`Blob size: ${blob.size} bytes`);
+
+      if (blob.size === 0) {
+        alert("Warning: The downloaded file appears to be empty. This might indicate an issue with the file on the server.");
+      }
+
       const url = window.URL.createObjectURL(blob);
 
       const a = document.createElement("a");
@@ -61,9 +94,11 @@ const History = () => {
       a.click();
       a.remove();
       window.URL.revokeObjectURL(url);
+
+      console.log(`Successfully downloaded file: ${filename}`);
     } catch (error) {
       console.error("Download failed:", error);
-      alert("Failed to download file.");
+      alert(`Failed to download file: ${error.message}`);
     }
   };
 
@@ -102,15 +137,101 @@ const History = () => {
         throw new Error("Failed to fetch metadata");
       }
       const data = await response.json();
-      alert(`Metadata for UUID ${uuid}:\n\n` + JSON.stringify(data, null, 2));
+      setMetadataModal({
+        isOpen: true,
+        data: data,
+        uuid: uuid
+      });
     } catch (error) {
       console.error("Metadata view failed:", error);
       alert("Failed to fetch metadata.");
     }
   };
 
+  const closeMetadataModal = () => {
+    setMetadataModal({
+      isOpen: false,
+      data: null,
+      uuid: null
+    });
+  };
+
+  const checkFileExists = async (uuid) => {
+    try {
+      const response = await fetch(`http://localhost:8000/file/metadata/${uuid}`);
+      if (response.ok) {
+        const metadata = await response.json();
+        console.log("File metadata:", metadata);
+        return metadata;
+      }
+      return null;
+    } catch (error) {
+      console.error("Error checking file metadata:", error);
+      return null;
+    }
+  };
+
   return (
     <div className="space-y-8">
+             {/* Metadata Modal */}
+       {metadataModal.isOpen && (
+         <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
+           <div className="bg-black rounded-2xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden border border-gray-700">
+                           <div className="flex items-center justify-between p-6 border-b border-gray-700">
+                <h3 className="text-xl font-semibold text-white">
+                  File Metadata
+                </h3>
+                                <button
+                  onClick={closeMetadataModal}
+                  className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors mr-4"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+             
+                           <div className="p-6 overflow-y-auto max-h-[60vh]">
+                <div className="mb-4">
+                  <p className="text-sm text-gray-300 mb-2">
+                    <span className="font-semibold">UUID:</span> {metadataModal.uuid}
+                  </p>
+                </div>
+                
+                <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
+                  <table className="w-full text-sm text-gray-200">
+                    <tbody>
+                      {metadataModal.data && Object.entries(metadataModal.data).map(([key, value]) => (
+                        <tr key={key} className="border-b border-gray-700 last:border-b-0">
+                          <td className="py-2 px-3 font-semibold text-gray-300 bg-gray-800 w-1/3">
+                            {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                          </td>
+                          <td className="py-2 px-3 break-words">
+                            {typeof value === 'object' ? (
+                              <pre className="whitespace-pre-wrap text-xs">
+                                {JSON.stringify(value, null, 2)}
+                              </pre>
+                            ) : (
+                              String(value)
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+             
+                           <div className="flex justify-end p-6 border-t border-gray-700">
+                <button
+                  onClick={closeMetadataModal}
+                  className="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors -mt-3"
+                >
+                  Close
+                </button>
+              </div>
+           </div>
+         </div>
+       )}
+
       <div className="text-center space-y-4">
         <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
           Upload History
@@ -198,3 +319,5 @@ const History = () => {
 };
 
 export default History;
+
+

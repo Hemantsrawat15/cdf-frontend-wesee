@@ -121,6 +121,62 @@ const FileUpload = ({ onFileSelect, selectedSource }) => {
     [onFileSelect]
   );
 
+  // const handleUpload = async () => {
+  //   if (!selectedFile) return;
+  //   setUploading(true);
+  //   setUploadProgress(0);
+
+  //   const formData = new FormData();
+  //   formData.append("file", selectedFile);
+
+  //   try {
+  //     // Step 1: Get source name from source ID
+  //     let sourceName = "";
+  //     if (selectedSource) {
+  //       const sourceRes = await fetch(`http://127.0.0.1:8000/source/name/${selectedSource}`);
+  //       if (!sourceRes.ok) throw new Error("Failed to fetch source name");
+  //       const sourceData = await sourceRes.json();
+  //       sourceName = sourceData.name;
+  //     }
+
+  //     formData.append("source", sourceName);
+
+  //     // Optional: Update UI with progress
+  //     const progressInterval = setInterval(() => {
+  //       setUploadProgress((prev) => {
+  //         if (prev >= 90) {
+  //           clearInterval(progressInterval);
+  //           return prev;
+  //         }
+  //         return prev + 10;
+  //       });
+  //     }, 200);
+
+  //     // Step 2: Upload file
+  //     const res = await fetch("http://127.0.0.1:8000/upload/detect", {
+  //       method: "POST",
+  //       body: formData,
+  //     });
+
+  //     clearInterval(progressInterval);
+
+  //     if (!res.ok) throw new Error("Upload failed");
+
+  //     const data = await res.json();
+  //     setUploading(false);
+  //     setUploadProgress(100);
+  //     setUploadedFilename(data.filename);
+
+  //     if (fileType === "image") {
+  //       setPreviewUrl(`http://localhost:5000/image/${data.filename}`);
+  //     }
+  //   } catch (err) {
+  //     alert("Upload failed: " + err.message);
+  //     setUploading(false);
+  //     setUploadProgress(0);
+  //   }
+  // };
+
   const handleUpload = async () => {
     if (!selectedFile) return;
     setUploading(true);
@@ -141,7 +197,7 @@ const FileUpload = ({ onFileSelect, selectedSource }) => {
 
       formData.append("source", sourceName);
 
-      // Optional: Update UI with progress
+      // Optional: Simulate progress
       const progressInterval = setInterval(() => {
         setUploadProgress((prev) => {
           if (prev >= 90) {
@@ -152,8 +208,13 @@ const FileUpload = ({ onFileSelect, selectedSource }) => {
         });
       }, 200);
 
-      // Step 2: Upload file
-      const res = await fetch("http://127.0.0.1:8000/upload/detect", {
+      // Step 2: Determine endpoint based on fileType
+      let endpoint = "http://127.0.0.1:8000/upload/detect";
+      if (fileType === "pdf" || fileType === "docx" || fileType === "doc" || fileType === "excel") {
+        endpoint = "http://127.0.0.1:8000/upload-document";
+      }
+
+      const res = await fetch(endpoint, {
         method: "POST",
         body: formData,
       });
@@ -167,9 +228,16 @@ const FileUpload = ({ onFileSelect, selectedSource }) => {
       setUploadProgress(100);
       setUploadedFilename(data.filename);
 
+      // Show preview for image only
       if (fileType === "image") {
         setPreviewUrl(`http://localhost:5000/image/${data.filename}`);
       }
+
+      // Optional: Show alert or console for metadata result
+      if (fileType === "pdf") {
+        console.log("Extracted PDF metadata:", data.metadata);
+      }
+
     } catch (err) {
       alert("Upload failed: " + err.message);
       setUploading(false);
