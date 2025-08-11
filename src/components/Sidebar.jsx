@@ -1,9 +1,15 @@
 import React from 'react';
-import { Home, Clock, ChevronRight } from 'lucide-react';
+import { Home, Clock, ChevronRight, LogOut } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import NavyLogo from '../assets/NavyLogo.png';
 
-const Sidebar = ({ activeTab, onTabChange, isCollapsed, onToggleCollapse }) => {
+const Sidebar = ({
+  activeTab,
+  onTabChange,
+  isCollapsed,
+  onToggleCollapse,
+  onLogout, // <-- Accept onLogout prop
+}) => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -59,12 +65,16 @@ const Sidebar = ({ activeTab, onTabChange, isCollapsed, onToggleCollapse }) => {
         </button>
       </nav>
 
-      {/* Footer */}
+      {/* Footer with Logout */}
       {!isCollapsed && (
-        <div className="p-4 border-t border-slate-800">
-          <div className="text-xs text-slate-400">
-            Version 1.0.0
-          </div>
+        <div className="p-4 border-t border-slate-800 flex flex-col gap-2">
+          <button
+            onClick={onLogout}
+            className="flex items-center gap-2 px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
+          >
+            <LogOut className="w-4 h-4" />
+            Logout
+          </button>
         </div>
       )}
     </div>

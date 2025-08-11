@@ -10,6 +10,7 @@ import {
   FileImage,
   Folder,
 } from "lucide-react";
+import toast from "react-hot-toast"; // <-- Add this
 
 const FileUpload = ({ onFileSelect, selectedSource }) => {
   const [dragActive, setDragActive] = useState(false);
@@ -33,9 +34,6 @@ const FileUpload = ({ onFileSelect, selectedSource }) => {
     ndjson: ["application/x-ndjson"], // ✅ added
   };
 
-
-
-
   useEffect(() => {
     return () => {
       if (previewUrl?.startsWith("blob:")) {
@@ -58,7 +56,6 @@ const FileUpload = ({ onFileSelect, selectedSource }) => {
     return null;
   };
 
-
   const handleDrag = useCallback((e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -80,7 +77,7 @@ const FileUpload = ({ onFileSelect, selectedSource }) => {
 
       const type = getFileTypeCategory(file.type, file.name);
       if (!type) {
-        alert("Unsupported file type");
+        toast.error("Unsupported file type");
         return;
       }
 
@@ -104,7 +101,7 @@ const FileUpload = ({ onFileSelect, selectedSource }) => {
 
       const type = getFileTypeCategory(file.type, file.name);
       if (!type) {
-        alert("Unsupported file type");
+        toast.error("Unsupported file type");
         return;
       }
 
@@ -121,62 +118,7 @@ const FileUpload = ({ onFileSelect, selectedSource }) => {
     [onFileSelect]
   );
 
-  // const handleUpload = async () => {
-  //   if (!selectedFile) return;
-  //   setUploading(true);
-  //   setUploadProgress(0);
-
-  //   const formData = new FormData();
-  //   formData.append("file", selectedFile);
-
-  //   try {
-  //     // Step 1: Get source name from source ID
-  //     let sourceName = "";
-  //     if (selectedSource) {
-  //       const sourceRes = await fetch(`http://127.0.0.1:8000/source/name/${selectedSource}`);
-  //       if (!sourceRes.ok) throw new Error("Failed to fetch source name");
-  //       const sourceData = await sourceRes.json();
-  //       sourceName = sourceData.name;
-  //     }
-
-  //     formData.append("source", sourceName);
-
-  //     // Optional: Update UI with progress
-  //     const progressInterval = setInterval(() => {
-  //       setUploadProgress((prev) => {
-  //         if (prev >= 90) {
-  //           clearInterval(progressInterval);
-  //           return prev;
-  //         }
-  //         return prev + 10;
-  //       });
-  //     }, 200);
-
-  //     // Step 2: Upload file
-  //     const res = await fetch("http://127.0.0.1:8000/upload/detect", {
-  //       method: "POST",
-  //       body: formData,
-  //     });
-
-  //     clearInterval(progressInterval);
-
-  //     if (!res.ok) throw new Error("Upload failed");
-
-  //     const data = await res.json();
-  //     setUploading(false);
-  //     setUploadProgress(100);
-  //     setUploadedFilename(data.filename);
-
-  //     if (fileType === "image") {
-  //       setPreviewUrl(`http://localhost:5000/image/${data.filename}`);
-  //     }
-  //   } catch (err) {
-  //     alert("Upload failed: " + err.message);
-  //     setUploading(false);
-  //     setUploadProgress(0);
-  //   }
-  // };
-
+  // --- THIS IS THE ONLY FUNCTION CHANGED ---
   const handleUpload = async () => {
     if (!selectedFile) return;
     setUploading(true);
@@ -238,13 +180,26 @@ const FileUpload = ({ onFileSelect, selectedSource }) => {
         console.log("Extracted PDF metadata:", data.metadata);
       }
 
+      // --- TOAST AND RESET FORM ---
+      toast.success("File uploaded successfully!");
+
+      setTimeout(() => {
+        setSelectedFile(null);
+        setPreviewUrl(null);
+        setFileType("");
+        setUploadedFilename(null);
+        setUploadProgress(0);
+        setUploading(false);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+        onFileSelect([]);
+      }, 1200);
+
     } catch (err) {
-      alert("Upload failed: " + err.message);
+      toast.error("Upload failed: " + err.message);
       setUploading(false);
       setUploadProgress(0);
     }
   };
-
 
   const handleCancel = () => {
     setSelectedFile(null);
